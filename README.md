@@ -5,11 +5,11 @@
 ## 下载单部电影的字幕
 例如为/home/movies/xxx.mkv下载字幕
 ```sh
-python fetch_subs.py /home/movies/xxx.mkv
+python3 fetch_subs.py /home/movies/xxx.mkv
 ```
 
 ## 下载一个目录下的所有电影的字幕
 例如为/home/movies目录下的所有电影下载字幕
 ```sh
-python fetch_subs.py /home/movies
+python3 fetch_subs.py /home/movies
 ```

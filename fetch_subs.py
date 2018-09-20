@@ -35,11 +35,15 @@ def download_sub(url, path, video_name, ext, num):
 
 
 def main(path):
-    # 文件夹
+    videos = []
+
+    # 如果是目录
     if os.path.isdir(path):
-        videos = os.listdir(path)
-        videos = filter(lambda x: re.match("(?i).*(mkv|mp4|rmvb|avi)$", x), videos)
-    # 文件
+        for root, _, files in os.walk(path):
+            for file in files:
+                if re.match("(?i).*(mkv|mp4|rmvb|avi)$", file):
+                    videos.append(os.path.join(root, file))
+    # 如果是文件
     else:
         videos = {path}
         path = os.path.split(path)[0]

@@ -6,7 +6,7 @@ import os
 import sys
 
 
-def movie_hash(file_path):
+def video_hash(file_path):
     with open(file_path, 'rb') as file:
         file.seek(0, 2)
         length = file.tell()
@@ -18,17 +18,17 @@ def movie_hash(file_path):
         return ';'.join(file_hash)
 
 
-def get_subs(file_hash, movie_name):
+def get_subs(file_hash, video_name):
     resp = requests.post("https://www.shooter.cn/api/subapi.php", data={
         "filehash": file_hash,
-        "pathinfo": movie_name, "format": "json"})
+        "pathinfo": video_name, "format": "json"})
     return json.loads(resp.content)
 
 
-def download_sub(url, path, movie, ext, num):
+def download_sub(url, path, video_name, ext, num):
     resp = requests.get(url)
 
-    sub_name = "{}.{}.{}".format(movie, num, ext)
+    sub_name = "{}.{}.{}".format(video_name, num, ext)
     with open(os.path.join(path, sub_name), "wb") as f:
         f.write(resp.content)
         print("成功下载:" + sub_name)
@@ -37,21 +37,21 @@ def download_sub(url, path, movie, ext, num):
 def main(path):
     # 文件夹
     if os.path.isdir(path):
-        movies = os.listdir(path)
-        movies = filter(lambda x: re.match("(?i).*(mkv|mp4|rmvb|avi)$", x), movies)
+        videos = os.listdir(path)
+        videos = filter(lambda x: re.match("(?i).*(mkv|mp4|rmvb|avi)$", x), videos)
     # 文件
     else:
-        movies = {path}
+        videos = {path}
         path = os.path.split(path)[0]
-    for movie in movies:
+    for video in videos:
         try:
-            file_hash = movie_hash(os.path.join(path, movie))
-            subs = get_subs(file_hash, movie)
+            file_hash = video_hash(os.path.join(path, video))
+            subs = get_subs(file_hash, video)
             for num, sub in enumerate(subs):
                 for file in sub["Files"]:
-                    download_sub(file["Link"], path, movie, file["Ext"], num)
+                    download_sub(file["Link"], path, video, file["Ext"], num)
         except:
-            print("未找到{}的字幕".format(movie))
+            print("未找到{}的字幕".format(video))
 
 
 if __name__ == '__main__':

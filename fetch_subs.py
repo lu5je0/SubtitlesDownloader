@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import hashlib
 import re
 import requests

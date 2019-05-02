@@ -1,10 +1,11 @@
-#!/usr/bin/python3
 import hashlib
 import re
 import requests
 import json
 import os
 import sys
+from multiprocessing.dummy import Pool as ThreadPool
+from requests import RequestException
 
 
 def video_hash(file_path):
@@ -35,8 +36,17 @@ def download_sub(url, path, video_name, ext, num):
         print("成功下载:" + sub_name)
 
 
+def task(path, video):
+    file_hash = video_hash(os.path.join(path, video))
+    subs = get_subs(file_hash, video)
+    for num, sub in enumerate(subs):
+        for file in sub["Files"]:
+            download_sub(file["Link"], path, video, file["Ext"], num)
+
+
 def main(path):
     videos = []
+    pool = ThreadPool(processes=30)
 
     # 如果是目录
     if os.path.isdir(path):
@@ -50,13 +60,13 @@ def main(path):
         path = os.path.split(path)[0]
     for video in videos:
         try:
-            file_hash = video_hash(os.path.join(path, video))
-            subs = get_subs(file_hash, video)
-            for num, sub in enumerate(subs):
-                for file in sub["Files"]:
-                    download_sub(file["Link"], path, video, file["Ext"], num)
+            pool.apply_async(task, (path, video))
+        except RequestException as _:
+            print("网路异常")
         except:
             print("未找到{}的字幕".format(video))
+    pool.close()
+    pool.join()
 
 
 if __name__ == '__main__':

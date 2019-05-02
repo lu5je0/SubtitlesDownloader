@@ -3,13 +3,18 @@
 
 # 使用方法
 ## 下载单个视频的字幕
-例如为/home/videos/xxx.mkv下载字幕
+下载/home/videos/xxx.mkv的字幕
 ```sh
 python3 fetch_subs.py /home/videos/xxx.mkv
 ```
 
 ## 下载一个目录及子目录下的所有视频的字幕
-例如为/home/videos目录下的所有视频下载字幕
+下载/home/videos目录下的所有视频的字幕
 ```sh
 python3 fetch_subs.py /home/videos
+```
+
+## 下载当前目录及子目录的所有视频的字幕
+```sh
+python3 fetch_subs.py .
 ```

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import hashlib
 import re
 import requests
@@ -62,7 +63,7 @@ def main(path):
         try:
             pool.apply_async(task, (path, video))
         except RequestException as _:
-            print("网路异常")
+            print("网络异常")
         except:
             print("未找到{}的字幕".format(video))
     pool.close()

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import hashlib
 import re
 import requests
@@ -29,10 +29,25 @@ def get_subs(file_hash, video_name):
 def download_sub(url, path, video_name, ext, num):
     resp = requests.get(url)
 
-    sub_name = "{}.{}.{}".format(video_name, num, ext)
+    if num != 0:
+        sub_name = "{}.{}.{}".format(video_name, num, ext)
+    else:
+        sub_name = "{}.{}".format(video_name, ext)
+
     with open(os.path.join(path, sub_name), "wb") as f:
         f.write(resp.content)
         print("成功下载:" + sub_name)
+
+
+sub_suffixes = ["srt", "ass"]
+
+
+def check_if_exists_subs(filename):
+    for suffix in sub_suffixes:
+        if os.path.exists(filename + "." + suffix):
+            print("存在{}的字幕, 跳过".format(filename))
+            return True
+    return False
 
 
 def main(path):
@@ -49,14 +64,16 @@ def main(path):
         videos = {path}
         path = os.path.split(path)[0]
     for video in videos:
+        if check_if_exists_subs(video):
+            continue
         try:
             file_hash = video_hash(os.path.join(path, video))
             subs = get_subs(file_hash, video)
             for num, sub in enumerate(subs):
                 for file in sub["Files"]:
                     download_sub(file["Link"], path, video, file["Ext"], num)
-        except:
-            print("未找到{}的字幕".format(video))
+        except Exception as e:
+            print("未找到{}的字幕 cause:{}".format(video, e))
 
 
 if __name__ == '__main__':

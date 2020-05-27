@@ -5,6 +5,7 @@ import requests
 import json
 import os
 import sys
+import asstosrt
 
 
 def video_hash(file_path):
@@ -34,9 +35,24 @@ def download_sub(url, path, video_name, ext, num):
     else:
         sub_name = "{}.{}".format(video_name, ext)
 
-    with open(os.path.join(path, sub_name), "wb") as f:
+    file_name = os.path.join(path, sub_name)
+    with open(file_name, "wb") as f:
         f.write(resp.content)
         print("成功下载:" + sub_name)
+
+    if ext == "ass":
+        duplicate_srt_sub(file_name)
+
+
+def duplicate_srt_sub(ass_filename):
+    srt_filename = ass_filename.replace(".ass", ".srt")
+    with open(srt_filename, "w+", encoding="utf8") as srt_file:
+        try:
+            with open(ass_filename, encoding="utf8") as ass_file:
+                srt_file.write(asstosrt.convert(ass_file))
+            print("duplicate srt {}".format(srt_filename))
+        except Exception as e:
+            print(e)
 
 
 sub_suffixes = ["srt", "ass"]

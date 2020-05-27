@@ -1,1 +1,1 @@
-python3 fetch_subs.py /data/data/com.termux/files/home/storage/shared/AAbout/download
+python3 fetch_subs.py $HOME/storage/shared/AAbout/download

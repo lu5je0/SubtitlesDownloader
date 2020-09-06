@@ -6,6 +6,7 @@ import json
 import os
 import sys
 import asstosrt
+import chardet
 
 
 def video_hash(file_path):
@@ -36,10 +37,16 @@ def download_sub(url, path, video_name, ext, num):
         sub_name = "{}.{}".format(video_name, ext)
 
     file_name = os.path.join(path, sub_name)
-    with open(file_name, "wb") as f:
-        f.write(resp.content)
-        print("成功下载:" + sub_name)
+    with open(file_name, "w", encoding="utf8") as f:
+        content = resp.content
+        charset = chardet.detect(content)["encoding"]
 
+        # 避免探测不精准，GBK兼容GB2312
+        if charset == "GB2312":
+            charset = "GBK"
+
+        f.write(bytes.decode(content, encoding=charset))
+        print("成功下载:" + sub_name)
     if ext == "ass":
         duplicate_srt_sub(file_name)
 

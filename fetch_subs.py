@@ -39,10 +39,10 @@ def download_sub(url, path, video_name, ext, num):
     file_name = os.path.join(path, sub_name)
     with open(file_name, "w", encoding="utf8") as f:
         content = resp.content
-        charset = chardet.detect(content)["encoding"]
+        charset = chardet.detect(content)["encoding"].lower()
 
-        if charset == "GB2312" or charset == "big5":
-            charset = "GBK"
+        if charset in ["gb2312", "big5"]:
+            charset = "gb18030"
 
         f.write(bytes.decode(content, encoding=charset))
         print("成功下载:" + sub_name)

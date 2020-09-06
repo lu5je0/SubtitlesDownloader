@@ -41,8 +41,7 @@ def download_sub(url, path, video_name, ext, num):
         content = resp.content
         charset = chardet.detect(content)["encoding"]
 
-        # 避免探测不精准，GBK兼容GB2312
-        if charset == "GB2312":
+        if charset == "GB2312" or charset == "big5":
             charset = "GBK"
 
         f.write(bytes.decode(content, encoding=charset))

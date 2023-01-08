@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 import hashlib
-import re
 import requests
 import json
 import os
 import sys
 import asstosrt
 import chardet
+from concurrent.futures import ALL_COMPLETED, ThreadPoolExecutor, wait
 
 
 def video_hash(file_path):
@@ -72,34 +72,28 @@ def check_if_exists_subs(filename):
     return False
 
 
-def main(path):
-    videos = []
+def fetch(video):
+    print('fetching {}'.format(video))
+    path = os.getcwd()
+    if check_if_exists_subs(video):
+        return
+    try:
+        file_hash = video_hash(os.path.join(path, video))
+        subs = get_subs(file_hash, video)
+        for num, sub in enumerate(subs):
+            for file in sub["Files"]:
+                download_sub(file["Link"], path, video, file["Ext"], num)
+    except Exception as e:
+        print("未找到{}的字幕 cause:{}".format(video, e))
 
-    # 如果是目录
-    if os.path.isdir(path):
-        for root, _, files in os.walk(path):
-            for file in files:
-                if re.match("(?i).*(mkv|mp4|rmvb|avi)$", file):
-                    videos.append(os.path.join(root, file))
-    # 如果是文件
-    else:
-        videos = {path}
-        path = os.path.split(path)[0]
-    for video in videos:
-        if check_if_exists_subs(video):
-            continue
-        try:
-            file_hash = video_hash(os.path.join(path, video))
-            subs = get_subs(file_hash, video)
-            for num, sub in enumerate(subs):
-                for file in sub["Files"]:
-                    download_sub(file["Link"], path, video, file["Ext"], num)
-        except Exception as e:
-            print("未找到{}的字幕 cause:{}".format(video, e))
-
+def main(videos):
+    executor = ThreadPoolExecutor(max_workers=20)
+    
+    tasks = [executor.submit(fetch, video) for video in videos]
+    wait(tasks, return_when=ALL_COMPLETED)
 
 if __name__ == '__main__':
     if len(sys.argv) <= 2:
         print("usage: fetch_subs filename")
     else:
-        main(sys.argv[1])
+        main(sys.argv[1:])

@@ -6,7 +6,7 @@ import os
 import sys
 import asstosrt
 import chardet
-from concurrent.futures import ALL_COMPLETED, ThreadPoolExecutor, wait
+from concurrent.futures import ThreadPoolExecutor
 
 
 def video_hash(file_path):
@@ -87,10 +87,12 @@ def fetch(video):
         print("未找到{}的字幕 cause:{}".format(video, e))
 
 def main(videos):
-    executor = ThreadPoolExecutor(max_workers=20)
+    executor = ThreadPoolExecutor(max_workers=30)
     
-    tasks = [executor.submit(fetch, video) for video in videos]
-    wait(tasks, return_when=ALL_COMPLETED)
+    for video in videos:
+        executor.submit(fetch, video)
+        
+    executor.shutdown()
 
 if __name__ == '__main__':
     if len(sys.argv) <= 2:

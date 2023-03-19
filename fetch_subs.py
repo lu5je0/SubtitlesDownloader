@@ -95,7 +95,7 @@ def main(videos):
     executor.shutdown()
 
 if __name__ == '__main__':
-    if len(sys.argv) <= 2:
+    if len(sys.argv) < 2:
         print("usage: fetch_subs filename")
     else:
         main(sys.argv[1:])

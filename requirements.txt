@@ -1,0 +1,3 @@
+asstosrt==0.1.6
+chardet==5.1.0
+requests==2.31.0
